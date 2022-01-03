@@ -81,7 +81,8 @@ class Asset:
     """
 
     CONFIGURATIONS: Dict[str, Dict[str, Any]] = {}
-
+    __abstract = False
+    
     def __init__(
         self,
         configuration_key: Optional[str] = None,
@@ -785,3 +786,8 @@ class WrappedAsyncModel:
         # The following does not currently work, because AsyncToSync does not
         # seem to correctly wrap asynchronous generators
         # self.predict_gen = AsyncToSync(self.async_model.predict_gen)
+
+AssetABC = Asset
+AssetABC.__abstract = True
+ModelABC = Model
+AssetABC.__abstract = True

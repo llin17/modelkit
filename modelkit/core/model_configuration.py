@@ -10,7 +10,7 @@ from typing import Any, Dict, List, Mapping, Optional, Set, Type, Union
 import pydantic
 from structlog import get_logger
 
-from modelkit.core.model import Asset
+from modelkit.core.model import Asset, AssetABC
 from modelkit.core.types import LibraryModelsType
 
 logger = get_logger(__name__)
@@ -62,6 +62,8 @@ def to_snake_case(name):
 
 def _configurations_from_objects(m) -> Dict[str, ModelConfiguration]:
     if inspect.isclass(m) and issubclass(m, Asset):
+        if m.__abstract:
+            return {}
         configs = {}
         if m.CONFIGURATIONS:
             for key, config in m.CONFIGURATIONS.items():

@@ -11,7 +11,7 @@ from modelkit.core.library import (
     download_assets,
     load_model,
 )
-from modelkit.core.model import Asset, AsyncModel, Model
+from modelkit.core.model import Asset, AssetABC, AsyncModel, Model
 from modelkit.core.model_configuration import (
     ModelConfiguration,
     _configurations_from_objects,
@@ -720,3 +720,27 @@ def test_model_multiple_asset_load(working_dir, monkeypatch):
     lib.preload()
 
     assert fetched == 1
+
+
+def test_model_sub_class(working_dir, monkeypatch):
+    monkeypatch.setenv("MODELKIT_ASSETS_DIR", working_dir)
+    with open(os.path.join(working_dir, "something.txt"), "w") as f:
+        f.write("OK")
+
+    class AbstractAsset(AssetABC):
+        def _load(self):
+            assert self.asset_path
+
+    class ConcreteAsset(AbstractAsset):
+        CONFIGURATIONS = {
+            "sub_class": {
+                "asset": "something.txt"
+            }
+        }
+
+        def _predict(self, item):
+            return item
+
+
+    lib = ModelLibrary(models=[ConcreteAsset, AbstractAsset])
+    lib.preload()
